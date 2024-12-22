@@ -75,6 +75,7 @@ function buildPaths(D) {
 function parse() {
   for (let ix=0; ix<INPUT.length; ix++) {
     const voxel = computePosition(ix, DIM, EDGE_LENGTH)
+    console.log(`check from index ${ix}, DIM ${DIM} LEN ${EDGE_LENGTH} -> ${voxel}`)
     for (let vwalk = 0; vwalk < DIR.length; vwalk++) {
       searchInDirection(voxel, DIR[vwalk])
     }
@@ -82,16 +83,16 @@ function parse() {
 }
 
 /**
- * @param int n = the index in the input string
+ * @param int ix = the index in the input string
  */
-function computePosition(n, D, len) {
+function computePosition(ix, D, len) {
   let coord = Array(D + 1).fill(0)
   for (let d = D - 1; d >= 0; d--) {
     let aggregate = 0
     for (let dn = D - 1; dn >= 0; dn--) {
       aggregate += coord[dn + 1] * Math.pow(len, dn + 1)
     }
-    coord[d] = Math.floor((n - aggregate) / Math.pow(D, d))
+    coord[d] = Math.floor((ix - aggregate) / Math.pow(len, d))
   }
   coord.pop()
 
@@ -121,9 +122,9 @@ function searchInDirection(coord, dir) {
   let word_buffer = ''
   let pos = [...coord] // copy coordinates, such that we don't modify them in the parent scope
   while (isValidCoord(pos)) {
-    const letter = getLetterAtCoord(coord)
-    if (word_buffer + letter === WORD) wordCount++
-    word_buffer = word_buffer.substring(1) + letter
+    const letter = getLetterAtCoord(pos)
+    word_buffer = word_buffer.slice(-1 * WORD.length + 1) + letter
+    if (word_buffer === WORD) wordCount++
     for (let d=0; d<DIM; d++) pos[d] += dir[d] // walk to the next voxel in the specified direction
   }
 }
@@ -134,9 +135,8 @@ function isValidCoord(pos) {
     outOfBounds = outOfBounds || (pos[d] < 0) || (pos[d] >= EDGE_LENGTH)
   }
 
-  return outOfBounds
+  return !outOfBounds
 }
 
-// console.log(computePosition(6, 3, 3))
 parse()
 console.log(`WORD COUNT: ${wordCount}`)
