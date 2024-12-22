@@ -24,7 +24,7 @@ let DIR = buildPaths(DIM)
 // Keep the count of word instances found during the hypercube walk
 let wordCount = 0
 
-// List of completed walks (coordinate + direction)
+// List of completed walks (edge voxel starting points + direction)
 let completed = []
 
 function setupTest(word, file) {
@@ -80,11 +80,13 @@ function buildPaths(D) {
  *
  * 1. start at the beginning of the input matrix, which is a 1D string
  * 2. compute the position in the hypercube, for the current letter
- * 3. for each walk-vector attempt to advance in that vector direction
- * 4. if there is a voxel at the next position, look at the word formed so far along the vector
- * 5. if there is no voxel (out-of-bounds) stop walking on that vector
- * 6. once all walks have stopped, advance to the next letter in the input matrix
- * 7. go to (2)
+ * 3. check if the voxel at current position is an edge voxel
+ * 4. check if the vector does not overlap an already parsed direction
+ * 5. for each walk-vector attempt to advance in that vector direction
+ * 6. if there is a voxel at the next position, look at the word formed so far along the vector
+ * 7. if there is no voxel (out-of-bounds) stop walking on that vector
+ * 8. once all walks have stopped, advance to the next letter in the input matrix
+ * 8. go to (2)
  */
 export function parse(word, file) {
   if (word && file) setupTest(word, file)
