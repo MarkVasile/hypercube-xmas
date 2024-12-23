@@ -19,6 +19,7 @@ class FillCubeWithVoxelsWireframe(ThreeDScene):
         self.play(Create(wireframe_cube))
 
         # Generate the voxels
+        voxels = []
         for x in range(num_voxels):
             for y in range(num_voxels):
                 for z in range(num_voxels):
@@ -26,7 +27,7 @@ class FillCubeWithVoxelsWireframe(ThreeDScene):
                     voxel = Cube(
                         side_length=voxel_size,
                         fill_color=BLUE,
-                        fill_opacity=1,
+                        fill_opacity=0.1,
                         stroke_width=0
                     )
                     voxel.shift(
@@ -36,9 +37,62 @@ class FillCubeWithVoxelsWireframe(ThreeDScene):
                             z * voxel_size - cube_size / 2 + voxel_size / 2,
                         ])
                     )
+                    voxels.append(voxel)
 
                     # Animate the appearance of this voxel
-                    self.play(FadeIn(voxel, scale=0.5), run_time=0.1)
+                    self.play(FadeIn(voxel, scale=0.5), run_time=0.01)
+
+        # Animate the interior diagonal being painted red
+        diagonal_voxels = [
+            voxels[x * num_voxels ** 2 + x * num_voxels + x]
+            for x in range(num_voxels)  # Include all indices from 0 to num_voxels - 1
+        ]
+
+        for voxel in diagonal_voxels:
+            self.play(
+                voxel.animate.set_fill(RED, opacity=1),  # Paint the voxel red and make it opaque
+                run_time=0.1
+            )
+
+        # Pause to display the filled cube
+        self.wait(2)
+
+        for voxel in diagonal_voxels:
+            self.play(
+                voxel.animate.set_fill(BLUE, opacity=0.3),  # Revert to transparent blue
+                run_time=0.01
+            )
+
+        face_voxels = [
+            voxels[y * num_voxels ** 2 + y * num_voxels + 0]  # Condition for diagonal on z=0 (front face)
+            for y in range(num_voxels)
+        ]
+
+        for voxel in face_voxels:
+            self.play(
+                voxel.animate.set_fill(RED, opacity=1),  # Paint the voxel red and make it opaque
+                run_time=0.1
+            )
+
+        # Pause to display the filled cube
+        self.wait(2)
+
+        for voxel in face_voxels:
+            self.play(
+                voxel.animate.set_fill(BLUE, opacity=0.3),  # Revert to transparent blue
+                run_time=0.01
+            )
+
+        edge_voxels = [
+            voxels[z * num_voxels ** 2]  # Condition for diagonal on z=0 (front face)
+            for y in range(num_voxels)
+        ]
+
+        for voxel in edge_voxels:
+            self.play(
+                voxel.animate.set_fill(RED, opacity=1),  # Paint the voxel red and make it opaque
+                run_time=0.1
+            )
 
         # Pause to display the filled cube
         self.wait(2)
